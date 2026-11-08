@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GIM GL 02 – GLB dan GLBB</title>
+<style>
+:root{--ink:#0e1d24;--panel:#15303b;--line:#2a4a57;--amber:#f2b134;--lime:#9be15d;--coral:#ff6b57;--sky:#5ec8e5;--txt:#eaf2ef;--mut:#9db5ba}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:16px/1.5 'Trebuchet MS','Segoe UI',system-ui,sans-serif;background:radial-gradient(1200px 600px at 80% -10%,#1d4252,var(--ink));color:var(--txt);overflow:hidden}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif;margin:.2em 0}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:.55em 1em;background:var(--amber);color:#201600;font-weight:700;transition:transform .12s,filter .12s}
+button:hover{filter:brightness(1.1)}button:active{transform:scale(.96)}
+button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],textarea{width:100%;padding:.6em .8em;border-radius:10px;border:1px solid var(--line);background:#0b171d;color:var(--txt);font:inherit}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.hidden{display:none!important}
+#start{height:100%;display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:center;padding:4vh 6vw}
+#start h1{font-size:clamp(34px,5vw,64px);line-height:1.05}
+.road{height:150px;border-radius:16px;background:#22262b;position:relative;overflow:hidden;margin-bottom:16px}
+.road:before{content:"";position:absolute;left:0;right:0;top:50%;border-top:5px dashed #f2f2f2;animation:lane 1.2s linear infinite}
+.road span{position:absolute;left:12%;top:18%;font-size:78px;animation:drive 3s ease-in-out infinite alternate}
+@keyframes lane{to{background-position:-60px 0}}@keyframes drive{to{left:62%}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+#start ol{padding-left:1.2em;color:var(--mut)}
+#app{height:100%;display:grid;grid-template-rows:auto auto 1fr}
+header{display:flex;gap:12px;align-items:center;padding:8px 18px;background:#0a161c;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header .brand{font-family:Georgia,serif;font-weight:700;font-size:20px;color:var(--amber)}
+header .sp{flex:1}
+.pill{background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:3px 12px;font-size:14px}
+.bar{width:130px;height:10px;border-radius:9px;background:#0b171d;overflow:hidden;display:inline-block;vertical-align:middle}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sky),var(--lime));width:0;transition:width .4s}
+nav{display:flex;gap:6px;padding:8px 18px 0;background:#0a161c}
+nav button{background:transparent;color:var(--mut);border-radius:10px 10px 0 0;border-bottom:3px solid transparent}
+nav button.on{color:var(--txt);border-bottom-color:var(--amber);background:var(--panel)}
+main{overflow:auto;padding:14px 18px}
+.grid2{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tag{color:var(--amber);font-weight:700}
+.formula{font-family:Consolas,monospace;background:#0b171d;border-left:4px solid var(--lime);padding:6px 12px;border-radius:6px;margin:6px 0}
+.nv{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:10px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0b171d;color:var(--txt);border:1px solid var(--line);font-weight:400}
+.opt.sel{border-color:var(--sky)}.opt.ok{background:#1d4a2a;border-color:var(--lime)}.opt.bad{background:#53201c;border-color:var(--coral)}
+.fb{margin-top:6px;padding:8px 12px;border-radius:8px;font-size:15px}.fb.ok{background:#1d4a2a}.fb.bad{background:#53201c}
+.q{margin:10px 0;padding-bottom:6px}
+.num{display:flex;gap:8px;align-items:center}.num input{max-width:200px}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{border:1px solid var(--line);padding:6px 10px;text-align:left}th{background:#0b171d;color:var(--amber)}
+canvas{width:100%;background:#0b171d;border-radius:12px;border:1px solid var(--line);display:block}
+.ctl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center}
+.ctl input[type=range]{width:100%;accent-color:var(--amber)}
+.mis{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.mis button{background:var(--panel);color:var(--txt);border:1px solid var(--line)}.mis button.on{border-color:var(--amber)}.mis button.done{background:#1d4a2a}
+.step{display:flex;gap:12px;align-items:flex-start}.step .n{background:var(--amber);color:#201600;font-weight:800;border-radius:50%;min-width:42px;height:42px;display:grid;place-items:center;font-size:20px}
+.ord{display:flex;gap:8px;align-items:center;background:#0b171d;border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:6px 0}.ord span{flex:1}.ord button{padding:.2em .6em}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:grid;place-items:center;z-index:9;padding:16px}
+#modal .box{background:var(--panel);border:1px solid var(--amber);border-radius:16px;padding:20px 24px;max-width:760px;width:100%;max-height:92vh;overflow:auto}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0a161c;border:1px solid var(--amber);padding:8px 16px;border-radius:99px;z-index:10;opacity:0;transition:opacity .3s;pointer-events:none}
+#toast.on{opacity:1}
+.badge{display:inline-block;margin:3px;padding:3px 10px;border-radius:99px;background:#0b171d;border:1px solid var(--line);color:var(--mut)}.badge.got{border-color:var(--amber);color:var(--amber)}
+@media (max-width:900px){#start,.grid2,.grid3{grid-template-columns:1fr}body{overflow:auto}}
+@media print{html{height:auto}.fb,.fb.ok,.fb.bad{background:#fff!important;color:#000!important;border:1px solid #888}.opt,.opt.sel,.opt.ok,.opt.bad{background:#fff!important;color:#000!important;border:1px solid #888}.opt.sel:before,.opt.ok:before{content:'\2714 '}.tag,h1,h2,h3,th{color:#000!important}th{background:#eee!important}td,th{border-color:#888}.formula{background:#f2f2f2;color:#000}.badge{color:#000!important;border-color:#888}#app{height:auto!important}body{overflow:visible;height:auto;background:#fff;color:#000}body.p-lkm #start,body.p-lkm header,body.p-lkm nav,body.p-lkm main>section:not(#tab-lkm),body.p-lkm #modal,body.p-lkm button{display:none!important}
+body.p-res #app,body.p-res #start{display:none}body.p-res #modal{position:static;background:none}body.p-res #modal button{display:none}
+.card,#modal .box{background:#fff;color:#000;border-color:#999}textarea,input{background:#fff!important;color:#000!important}#app{display:block}main{overflow:visible}}
+</style>
+</head>
+<body>
+<section id="start">
+ <div>
+  <div class="road"><span>🏎️</span></div>
+  <h1>Lintasan GLB &amp; GLBB</h1>
+  <p>Fisika Kelas X (Fase E). Pelajari gerak lurus beraturan dan berubah beraturan, selesaikan misi di lintasan, lalu baca grafiknya.</p>
+ </div>
+ <div class="card">
+  <h2>Petunjuk permainan</h2>
+  <ol><li>Baca <b>Teori</b> dan jawab kuis pemahaman.</li><li>Latih langkah di <b>Prosedur</b>.</li><li>Selesaikan 3 misi di <b>Simulasi</b>.</li><li>Isi <b>LKM</b>, lalu lihat hasil akhir.</li></ol>
+  <label for="nm"><b>Nama atau nama panggilan</b></label>
+  <input id="nm" type="text" maxlength="30" placeholder="Tulis namamu">
+  <p style="margin:12px 0 0"><button id="go">MULAI BERMAIN</button></p>
+  <p style="color:var(--mut);font-size:13px">GIM GL 02 · SMAN 1 Pinrang · 2026 · berjalan offline</p>
+ </div>
+</section>
+
+<div id="app" class="hidden">
+ <header>
+  <span class="brand">GIM GL 02</span><span class="pill">👤 <span id="hn"></span></span>
+  <span class="pill">⭐ <span id="hs">0</span></span>
+  <span class="pill">Progres <span class="bar"><i id="hb"></i></span> <span id="hp">0%</span></span>
+  <span class="sp"></span>
+  <button class="ghost" id="bSnd" title="Suara">🔊 Suara aktif</button>
+  <button class="ghost" id="bFs">⛶ Layar penuh</button>
+  <button class="ghost" id="bHelp">❓ Bantuan</button>
+  <button class="ghost" id="bRes">🏁 Hasil</button>
+  <button class="ghost" id="bReset">↺ Reset</button>
+ </header>
+ <nav id="nav"></nav>
+ <main id="main">
+  <section id="tab-teori"></section><section id="tab-prosedur" class="hidden"></section><section id="tab-simulasi" class="hidden"></section><section id="tab-lkm" class="hidden"></section><section id="tab-pengembang" class="hidden"></section>
+ </main>
+</div>
+<div id="modal" class="hidden"><div class="box" id="mbox"></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='gimgl02_sriwahyuni_v1';
+var $=function(s){return document.querySelector(s)};
+var mem=null,storageOK=true,warned=false;
+function fresh(name,snd){return {name:name||'',snd:snd!==false,score:0,done:{},right:{},ans:{},res:{},tp:0,ps:0,ordCur:null,refl:'',rub:[0,0,0],tab:'teori'}}
+var S=fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){storageOK=false;if(!warned){warned=true;toast('Penyimpanan lokal tidak tersedia. Progres hanya tersimpan selama sesi ini.')}}}
+function load(){try{var r=localStorage.getItem(KEY);if(r){var o=JSON.parse(r);if(o&&o.done)return o}}catch(e){storageOK=false}return null}
+
+/* ===== Audio ===== */
+var AC=null;
+function tone(f,d,type,delay,vol){if(!S.snd)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+(delay||0);o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(vol||.08,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d)}catch(e){}}
+var sfx={click:function(){tone(520,.07,'square')},ok:function(){tone(660,.12,'triangle');tone(880,.18,'triangle',.1)},bad:function(){tone(200,.25,'sawtooth',0,.05)},mission:function(){[523,659,784,1047].forEach(function(f,i){tone(f,.16,'triangle',i*.1)})},ach:function(){[784,988,1175].forEach(function(f,i){tone(f,.2,'sine',i*.12)})},start:function(){tone(330,.1,'square');tone(494,.1,'square',.1);tone(660,.2,'square',.2)}};
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('on')},3200)}
+
+/* ===== Data ===== */
+var Q={
+t1:{tab:'Teori',type:'mc',text:'Sebuah mobil bergerak GLB dengan kecepatan 20 m/s selama 15 s. Berapa jarak yang ditempuh?',opts:['200 m','300 m','350 m','400 m'],ans:1,exp:'Pada GLB s = v·t = 20 × 15 = 300 m.',hint:'Gunakan s = v·t. Kalikan kecepatan dengan waktu.'},
+t2:{tab:'Teori',type:'mc',text:'Motor start dari diam dengan percepatan tetap 2 m/s². Berapa kecepatannya setelah 5 s?',opts:['5 m/s','10 m/s','15 m/s','20 m/s'],ans:1,exp:'v = v₀ + a·t = 0 + 2 × 5 = 10 m/s.',hint:'Gunakan v = v₀ + a·t dengan v₀ = 0.'},
+t3:{tab:'Teori',type:'mc',text:'Grafik v–t berupa garis lurus mendatar di atas sumbu t. Gerak apakah itu?',opts:['GLB','GLBB dipercepat','GLBB diperlambat','Benda diam'],ans:0,exp:'Kecepatan tidak berubah (gradien 0, a = 0), itu ciri GLB. Luas di bawah garis = jarak.',hint:'Garis mendatar berarti nilai v tidak berubah.'},
+t4:{tab:'Teori',type:'mc',text:'Data kecepatan tiap 1 s adalah 2, 4, 6, 8 m/s. Jenis geraknya?',opts:['GLB','GLBB dengan a = 2 m/s²','GLBB dengan a = 4 m/s²','Tidak dapat ditentukan'],ans:1,exp:'Kecepatan bertambah tetap 2 m/s tiap sekon, jadi GLBB dengan a = 2 m/s².',hint:'Hitung selisih kecepatan tiap selang waktu yang sama.'},
+l1:{tab:'LKM',type:'mc',text:'1. Grafik x–t sebuah benda berbentuk garis lurus miring ke atas. Benda tersebut …',opts:['bergerak GLB','bergerak GLBB dipercepat','diam','bergerak GLBB diperlambat'],ans:0,exp:'Garis lurus pada grafik x–t berarti gradiennya (kecepatan) tetap, yaitu GLB.',hint:'Gradien grafik x–t sama dengan kecepatan.'},
+l2:{tab:'LKM',type:'mc',text:'2. Benar atau salah: pada GLBB, grafik v–t berbentuk garis lurus miring.',opts:['Benar','Salah'],ans:0,exp:'Benar. v = v₀ + a·t adalah fungsi linear, sehingga grafik v–t lurus miring dengan gradien a.',hint:'Lihat bentuk persamaan v = v₀ + a·t.'},
+l3:{tab:'LKM',type:'num',unit:'m',tol:.1,text:'3. Mobil dari diam, a = 3 m/s² (GLBB). Berapa jarak yang ditempuh dalam 4 s?',ans:24,exp:'s = v₀t + ½at² = 0 + ½ × 3 × 4² = 24 m.',hint:'Gunakan s = v₀t + ½at² dengan v₀ = 0.'},
+l4:{tab:'LKM',type:'num',unit:'m/s²',tol:.01,text:'4. Grafik v–t: kecepatan naik dari 0 ke 20 m/s dalam 5 s. Berapa percepatannya?',ans:4,exp:'a = gradien grafik v–t = Δv/Δt = 20/5 = 4 m/s².',hint:'Percepatan = perubahan kecepatan dibagi selang waktu.'}
+};
+var QT=['t1','t2','t3','t4'],QL=['l1','l2','l3','l4'];
+var ACT=['t1','t2','t3','t4','ord','m1','m2','m3','l1','l2','l3','l4','refl'];
+function sk(kind){function pan(ox,d,lab){return '<g transform="translate('+ox+',0)"><path d="M12 8V100H128" stroke="#9db5ba" fill="none"/><path d="'+d+'" stroke="#f2b134" stroke-width="3" fill="none"/><text x="70" y="116" fill="#9db5ba" font-size="11" text-anchor="middle">'+lab+'</text></g>'}
+var a=kind==='glb'?pan(0,'M12 100L120 24','grafik x–t: lurus miring')+pan(140,'M12 50H120','grafik v–t: mendatar'):pan(0,'M12 100Q70 100 120 18','grafik x–t: parabola')+pan(140,'M12 90L120 24','grafik v–t: lurus miring');
+return '<svg viewBox="0 0 280 122" width="100%" role="img" aria-label="Sketsa grafik '+kind.toUpperCase()+'">'+a+'</svg>'}
+var T=[
+{t:'GLB – Gerak Lurus Beraturan',apa:'Gerak benda pada lintasan lurus dengan kecepatan tetap, sehingga percepatannya nol.',def:'<b>Kecepatan</b>: perpindahan tiap satuan waktu (m/s). <b>Percepatan</b>: perubahan kecepatan tiap satuan waktu (m/s²).',inti:'Dalam selang waktu yang sama, jarak yang ditempuh selalu sama.<div class="formula">s = v · t &nbsp;&nbsp; a = 0</div>',contoh:'Travelator di bandara bergerak mendatar dengan kelajuan tetap. Mobil di jalan tol yang menjaga 80 km/jam juga mendekati GLB.',fakta:'Cahaya di ruang hampa bergerak dengan kelajuan tetap sekitar 3×10⁸ m/s.',refl:'Mengapa GLB yang benar-benar sempurna sulit ditemukan di jalan raya?',svg:'glb',q:'t1'},
+{t:'GLBB – Gerak Lurus Berubah Beraturan',apa:'Gerak benda pada lintasan lurus dengan percepatan tetap (tidak nol), sehingga kecepatan berubah secara teratur.',def:'<b>v₀</b>: kecepatan awal. <b>a</b>: percepatan; bernilai negatif bila benda diperlambat.',inti:'Kecepatan berubah dengan jumlah yang sama tiap selang waktu yang sama.<div class="formula">v = v₀ + a·t<br>s = v₀·t + ½·a·t²<br>v² = v₀² + 2·a·s</div>',contoh:'Motor mulai melaju dari lampu merah (dipercepat) dan buah kelapa yang jatuh (a ≈ g, hambatan udara diabaikan).',fakta:'Percepatan gravitasi di Bumi sekitar 9,8 m/s² dan dianggap hampir tetap di dekat permukaan.',refl:'Apa arti tanda negatif pada percepatan saat motor mengerem?',svg:'glbb',q:'t2'},
+{t:'Menganalisis dengan Grafik',apa:'Grafik membantu kita membaca jenis gerak tanpa menghitung panjang.',def:'<b>Gradien</b> grafik x–t = kecepatan. <b>Gradien</b> grafik v–t = percepatan. <b>Luas</b> di bawah grafik v–t = jarak.',inti:'<b>GLB</b>: x–t lurus miring, v–t mendatar.<br><b>GLBB</b>: x–t melengkung (parabola), v–t lurus miring.<br>Garis v–t yang makin curam berarti percepatan lebih besar.',contoh:'Speedometer yang dicatat tiap detik lalu diplot menghasilkan grafik v–t perjalanan.',fakta:'Luas segitiga di bawah grafik v–t dari diam: ½ × v × t, sama dengan rumus s = ½at².',refl:'Jika grafik v–t menurun menuju nol, apa yang terjadi pada benda?',svg:'glbb',q:'t3'},
+{t:'Membedakan GLB dan GLBB',apa:'Kunci pembeda: apakah kecepatan benda berubah?',def:'GLB: v tetap. GLBB: v berubah dengan percepatan tetap.',inti:'<table><tr><th></th><th>GLB</th><th>GLBB</th></tr><tr><td>Kecepatan</td><td>tetap</td><td>berubah teratur</td></tr><tr><td>Percepatan</td><td>0</td><td>tetap, ≠ 0</td></tr><tr><td>x–t</td><td>garis lurus</td><td>parabola</td></tr><tr><td>v–t</td><td>mendatar</td><td>lurus miring</td></tr></table>',contoh:'Tabel data v tiap sekon: bila selisih v selalu 0 → GLB, bila selisih selalu sama ≠ 0 → GLBB.',fakta:'Roller coaster dan mobil balap memakai kombinasi keduanya pada ruas lintasan lurus.',refl:'Bagaimana kamu menentukan jenis gerak dari tabel data?',svg:'glb',q:'t4'}];
+var STEPS=[['📖','Baca dan catat besaran','Tuliskan besaran yang diketahui (v₀, v, a, t, s) beserta satuannya dalam SI.'],['🔍','Tentukan jenis gerak','Cek kecepatannya: tetap berarti GLB (a = 0); berubah teratur berarti GLBB (a tetap).'],['🧩','Pilih rumus yang cocok','GLB: s = v·t. GLBB: v = v₀ + at, s = v₀t + ½at², atau v² = v₀² + 2as.'],['🧮','Substitusi dan hitung','Masukkan angka beserta satuan, lalu hitung dengan teliti.'],['📈','Periksa dengan grafik dan satuan','Cocokkan hasil dengan bentuk grafik x–t atau v–t, dan pastikan satuannya benar.']];
+
+/* ===== Skor ===== */
+function award(id,p){if(S.done[id])return false;S.done[id]=1;S.score+=p;sfx.mission();checkBonus();return true}
+function checkBonus(){var all=ACT.every(function(k){return S.done[k]});if(all&&!S.done.bonus){S.done.bonus=1;S.score+=50;toast('🏆 Semua aktivitas selesai! Bonus +50');setTimeout(sfx.ach,400)}}
+function prog(){var n=ACT.filter(function(k){return S.done[k]}).length;return Math.round(n/ACT.length*100)}
+function hud(){$('#hn').textContent=S.name;$('#hs').textContent=S.score;var p=prog();$('#hb').style.width=p+'%';$('#hp').textContent=p+'%';$('#bSnd').textContent=S.snd?'🔊 Suara aktif':'🔇 Suara mati'}
+
+/* ===== Soal ===== */
+function qHTML(id){var q=Q[id],a=S.ans[id],r=S.res[id],b='';
+if(q.type==='num')b='<div class="num"><input type="text" inputmode="decimal" data-qn="'+id+'" value="'+(a!==undefined?a:'')+'" placeholder="Jawaban (angka)" aria-label="Jawaban"> <span>'+q.unit+'</span></div>';
+else b=q.opts.map(function(o,i){return '<button class="opt'+(a===i?' sel':'')+(r!==undefined&&a===i?(r?' ok':' bad'):'')+'" data-q="'+id+'" data-o="'+i+'">'+o+'</button>'}).join('');
+var fb=r===undefined?'':'<div class="fb '+(r?'ok':'bad')+'">'+(r?'✅ Benar! '+q.exp+(S.done[id]?' (+10)':''):'❌ Belum tepat. Petunjuk: '+q.hint)+'</div>';
+return '<div class="q"><p><b>'+q.text+'</b></p>'+b+fb+'</div>'}
+function check(id){var q=Q[id],v=S.ans[id];if(v===undefined||v==='')return false;var ok;
+if(q.type==='num'){var n=parseFloat(String(v).replace(',','.'));ok=!isNaN(n)&&Math.abs(n-q.ans)<=q.tol}else ok=(v===q.ans);
+S.res[id]=ok?1:0;if(ok){S.right[id]=1;if(!S.done[id]){S.done[id]=1;S.score+=10;checkBonus()}sfx.ok()}else sfx.bad();return true}
+
+/* ===== Tabs ===== */
+var TABS=[['teori','📘 Teori'],['prosedur','🧭 Prosedur'],['simulasi','🏎️ Simulasi'],['lkm','📝 LKM'],['pengembang','👩‍🏫 Pengembang']];
+function buildNav(){$('#nav').innerHTML=TABS.map(function(t){return '<button data-tab="'+t[0]+'">'+t[1]+'</button>'}).join('')}
+function showTab(t){S.tab=t;TABS.forEach(function(x){$('#tab-'+x[0]).classList.toggle('hidden',x[0]!==t)});document.querySelectorAll('#nav button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t)});({teori:rTeori,prosedur:rProsedur,simulasi:rSim,lkm:rLKM,pengembang:rDev})[t]();hud();save()}
+
+function rTeori(){var p=T[S.tp];$('#tab-teori').innerHTML='<div class="card" style="margin-bottom:10px"><b>Halaman '+(S.tp+1)+' dari '+T.length+'</b> <span class="bar" style="width:240px;margin-left:10px"><i style="width:'+((S.tp+1)/T.length*100)+'%"></i></span></div><div class="grid2"><div class="card"><h2>'+p.t+'</h2><p><span class="tag">Apa yang dipelajari?</span> '+p.apa+'</p><p><span class="tag">Istilah penting.</span> '+p.def+'</p><p><span class="tag">Inti materi.</span></p>'+p.inti+'<p><span class="tag">Contoh sehari-hari.</span> '+p.contoh+'</p><p><span class="tag">Tahukah kamu?</span> '+p.fakta+'</p><p><span class="tag">Refleksi.</span> <i>'+p.refl+'</i></p></div><div><div class="card">'+sk(p.svg)+'</div><div class="card" style="margin-top:12px"><h3>Kuis pemahaman</h3>'+qHTML(p.q)+'</div></div></div><div class="nv"><button class="ghost" data-nav="tp-" '+(S.tp===0?'disabled':'')+'>← Sebelumnya</button>'+(S.tp===T.length-1?'<button data-go="prosedur">Lanjut ke Prosedur →</button>':'<button data-nav="tp+">Berikutnya →</button>')+'</div>'}
+
+function rProsedur(){var i=S.ps,s=STEPS[i];var ord=S.ordCur;
+if(!ord){ord=S.ordCur=[3,0,4,1,2]}
+var done=S.done.ord;
+$('#tab-prosedur').innerHTML='<div class="grid2"><div class="card"><h2>Langkah menganalisis soal GLB/GLBB</h2><div class="step"><div class="n">'+(i+1)+'</div><div><h3>'+s[0]+' '+s[1]+'</h3><p>'+s[2]+'</p></div></div><p style="color:var(--mut)">Contoh: mobil dari diam, a = 2 m/s², t = 6 s. Jenis gerak: GLBB. Rumus: s = ½at² = ½ × 2 × 36 = 36 m.</p><div class="nv"><button class="ghost" data-nav="ps-" '+(i===0?'disabled':'')+'>← Mundur</button><span>Langkah '+(i+1)+'/'+STEPS.length+'</span><button data-nav="ps+" '+(i===STEPS.length-1?'disabled':'')+'>Maju →</button></div><p>'+(i===STEPS.length-1?'<b>Ringkasan:</b> identifikasi besaran → tentukan jenis gerak → pilih rumus → hitung → periksa dengan grafik dan satuan.':'')+'</p></div><div class="card"><h2>Tantangan: urutkan langkah '+(done?'✅':'')+'</h2><p>Susun langkah dengan tombol ▲ ▼ lalu periksa. (+20, sekali saja)</p>'+ord.map(function(k,j){return '<div class="ord"><span>'+STEPS[k][0]+' '+STEPS[k][1]+'</span><button class="ghost" data-mv="'+j+'" data-d="-1">▲</button><button class="ghost" data-mv="'+j+'" data-d="1">▼</button></div>'}).join('')+'<p><button data-chkord>Periksa urutan</button> <button class="ghost" data-shuf>Acak ulang</button></p><div id="ordfb"></div></div></div>'}
+
+/* ===== Simulasi ===== */
+var M=[{n:'Eksplorasi bebas',t:null,mode:null,v0:null,hint:'Ubah v₀ dan a, lalu lihat bentuk grafiknya.'},{n:'Misi 1',t:100,mode:'GLB',v0:null,txt:'Tempuh tepat 100 m dalam 10 s dengan GLB.',hint:'GLB: s = v·t. Berapa v agar s = 100 m saat t = 10 s?'},{n:'Misi 2',t:100,mode:'GLBB',v0:0,txt:'Mulai dari diam (v₀ = 0), tempuh 100 m dalam 10 s dengan GLBB.',hint:'s = ½·a·t². Susun a = 2s / t².'},{n:'Misi 3',t:150,mode:'GLBB',v0:10,txt:'Mulai v₀ = 10 m/s, tempuh 150 m dalam 10 s dengan GLBB.',hint:'s = v₀t + ½at² → 150 = 100 + 50a. Cari a.'}];
+var sim={m:0,mode:'GLB',v0:10,a:0,run:false,t:0,raf:0,ran:false},TMAX=10;
+function xt(t){return sim.v0*t+.5*sim.a*t*t}function vt(t){return sim.v0+sim.a*t}
+function rSim(){var m=M[sim.m];
+$('#tab-simulasi').innerHTML='<div class="mis" id="mis">'+M.map(function(x,i){return '<button data-m="'+i+'" class="'+(sim.m===i?'on ':'')+(S.done['m'+i]?'done':'')+'">'+(S.done['m'+i]?'✅ ':'')+x.n+'</button>'}).join('')+'</div><div class="grid2"><div class="card"><b>Skenario:</b> mobil uji di lintasan lurus 200 m, tanpa gesekan. '+(m.txt?'<br><b>'+m.n+':</b> '+m.txt:'<br>Eksplorasi bebas: tidak ada poin.')+'<canvas id="trk" width="900" height="110" style="margin-top:8px"></canvas><canvas id="gr" width="900" height="250" style="margin-top:8px"></canvas></div><div class="card"><h3>Panel kendali</h3><div class="ctl"><label>Jenis gerak</label><div><label><input type="radio" name="md" value="GLB" '+(sim.mode==='GLB'?'checked':'')+(m.mode?' disabled':'')+'> GLB</label> &nbsp; <label><input type="radio" name="md" value="GLBB" '+(sim.mode==='GLBB'?'checked':'')+(m.mode?' disabled':'')+'> GLBB</label></div><span></span><label for="sv">'+(sim.mode==='GLB'?'v':'v₀')+'</label><input type="range" id="sv" min="0" max="30" step="1" value="'+sim.v0+'" '+(m.v0!==null&&m.v0!==undefined?'disabled':'')+'><b id="vv">'+sim.v0+' m/s</b><label for="sa">a</label><input type="range" id="sa" min="-5" max="5" step="0.5" value="'+sim.a+'" '+(sim.mode==='GLB'?'disabled':'')+'><b id="av">'+sim.a+' m/s²</b></div><p><button id="run">▶ Jalankan (10 s)</button> <button class="ghost" id="hint">💡 Petunjuk</button> <button class="ghost" id="rs">↺ Ulangi simulasi</button></p><div id="out" class="fb" style="background:#0b171d">Atur parameter lalu tekan Jalankan. Garis putus-putus pada grafik adalah prediksi.</div><p style="font-size:13px;color:var(--mut)"><b>Batasan model:</b> lintasan lurus, percepatan konstan, tanpa gesekan dan hambatan udara. Mobil berhenti ditampilkan di 0 m bila bergerak mundur.</p></div></div>';
+draw(0)}
+function evalM(){var m=M[sim.m],x=xt(TMAX),v=vt(TMAX),o=$('#out');
+var kind=sim.mode==='GLB'||sim.a===0?(sim.v0===0?'diam':'GLB'):'GLBB '+(sim.a*vt(TMAX/2)>0?'dipercepat':'diperlambat');
+var info='Hasil: x = '+x.toFixed(1)+' m, v akhir = '+v.toFixed(1)+' m/s. Jenis gerak: '+kind+'. ';
+if(!m.t){o.className='fb';o.innerHTML=info+(sim.mode==='GLB'?'Grafik v–t mendatar karena a = 0.':'Grafik v–t miring, gradiennya = a.');return}
+if(Math.abs(x-m.t)<=1){var first=award('m'+sim.m,20);var all=[1,2,3].every(function(k){return S.done['m'+k]});var bonus=all&&award('sim',30);o.className='fb ok';o.innerHTML='🎉 '+info+'Tepat sasaran! '+(first?'+20 poin. ':'(poin misi ini sudah diambil) ')+(bonus?'Simulasi selesai, +30 poin! ':'')+'<br><b>Kesimpulan:</b> '+(sim.mode==='GLB'?'pada GLB jarak = kecepatan × waktu.':'pada GLBB percepatan tetap mengubah kecepatan dan jarak bertambah menurut ½at².')+(all?'<br><b>Refleksi:</b> bandingkan bentuk grafik x–t kedua jenis gerak. Tulis temuanmu di LKM.':'');sfx.mission();hud();rMis();save()}
+else{sfx.bad();o.className='fb bad';o.innerHTML='❌ '+info+'Target '+m.t+' m, selisih '+Math.abs(x-m.t).toFixed(1)+' m ('+(x<m.t?'kurang jauh':'terlalu jauh')+'). Coba ubah '+(sim.mode==='GLB'?'v':'a')+'.'}}
+function rMis(){document.querySelectorAll('#mis button').forEach(function(b,i){b.className=(sim.m===i?'on ':'')+(S.done['m'+i]?'done':'');b.textContent=(S.done['m'+i]?'✅ ':'')+M[i].n})}
+function draw(t){var c=$('#trk'),g=$('#gr');if(!c||!g)return;var cx=c.getContext('2d'),gx=g.getContext('2d');
+cx.clearRect(0,0,900,110);cx.fillStyle='#22262b';cx.fillRect(0,40,900,50);cx.strokeStyle='#ddd';cx.setLineDash([14,12]);cx.beginPath();cx.moveTo(0,65);cx.lineTo(900,65);cx.stroke();cx.setLineDash([]);
+cx.fillStyle='#9db5ba';cx.font='12px sans-serif';for(var k=0;k<=200;k+=50){var px=40+k/200*800;cx.fillRect(px,36,2,8);cx.fillText(k+' m',px-12,30)}
+var m=M[sim.m];if(m.t){var tx=40+m.t/200*800;cx.fillStyle='#9be15d';cx.fillRect(tx,40,5,50);cx.fillText('target '+m.t+' m',tx-30,104)}
+var pos=Math.max(0,Math.min(200,xt(t)));cx.font='34px sans-serif';cx.fillText('🏎️',40+pos/200*800-16,78);
+gx.clearRect(0,0,900,250);var N=100,xs=[],vs=[];for(var i=0;i<=N;i++){var tt=i/N*TMAX;xs.push(xt(tt));vs.push(vt(tt))}
+function pane(ox,arr,lab,unit){var mn=Math.min(0,Math.min.apply(null,arr)),mx=Math.max(1,Math.max.apply(null,arr)),W=380,H=190;gx.strokeStyle='#9db5ba';gx.lineWidth=1;gx.beginPath();gx.moveTo(ox,20);gx.lineTo(ox,20+H);gx.lineTo(ox+W,20+H);gx.stroke();
+var zy=20+H-(0-mn)/(mx-mn)*H;gx.strokeStyle='#2a4a57';gx.beginPath();gx.moveTo(ox,zy);gx.lineTo(ox+W,zy);gx.stroke();gx.fillStyle='#9db5ba';gx.font='13px sans-serif';gx.fillText(lab+' ('+unit+')',ox+4,14);gx.fillText('t (s)',ox+W-30,20+H+16);gx.fillText(mx.toFixed(0),ox-28,28);gx.fillText(mn.toFixed(0),ox-28,20+H);
+function pt(i){return [ox+i/N*W,20+H-(arr[i]-mn)/(mx-mn)*H]}
+gx.strokeStyle='#5ec8e5';gx.setLineDash([5,5]);gx.lineWidth=2;gx.beginPath();for(var i=0;i<=N;i++){var p=pt(i);i?gx.lineTo(p[0],p[1]):gx.moveTo(p[0],p[1])}gx.stroke();gx.setLineDash([]);
+var e=Math.round(t/TMAX*N);if(e>0){gx.strokeStyle='#f2b134';gx.lineWidth=3;gx.beginPath();for(var j=0;j<=e;j++){var q=pt(j);j?gx.lineTo(q[0],q[1]):gx.moveTo(q[0],q[1])}gx.stroke()}}
+pane(50,xs,'Grafik x–t','m');pane(490,vs,'Grafik v–t','m/s')}
+function runSim(){if(sim.run)return;sim.run=true;sim.ran=true;$('#run').disabled=true;var st=performance.now();sfx.click();
+function f(now){var t=Math.min(TMAX,(now-st)/500);draw(t);if(t<TMAX)sim.raf=requestAnimationFrame(f);else{sim.run=false;var b=$('#run');if(b)b.disabled=false;evalM()}}sim.raf=requestAnimationFrame(f)}
+function resetSim(){cancelAnimationFrame(sim.raf);sim.run=false;sim.m=0;sim.mode='GLB';sim.v0=10;sim.a=0;if(S.tab==='simulasi')rSim()}
+function pickM(i){if(sim.run)return;var m=M[i];sim.m=i;if(m.mode)sim.mode=m.mode;if(m.v0!==null&&m.v0!==undefined)sim.v0=m.v0;else if(i===1)sim.v0=5;sim.a=sim.mode==='GLB'?0:(i===2?1:i===3?.5:sim.a);rSim()}
+
+/* ===== LKM ===== */
+function rLKM(){var rub=['Saya menjelaskan perbedaan GLB dan GLBB.','Saya menyebut bukti dari simulasi atau grafik.','Saya menyebut contoh dari kehidupan sehari-hari.'];
+$('#tab-lkm').innerHTML='<div class="card"><h2>LKM: Menganalisis GLB dan GLBB dengan Grafik</h2><p><b>Identitas:</b> '+S.name+' · Kelas X · Fisika · SMAN 1 Pinrang</p><p><b>Tujuan:</b> membedakan GLB dan GLBB, menentukan jenisnya, dan menganalisisnya dengan grafik.</p><p><b>Petunjuk:</b> jawab semua bagian, lalu tekan Periksa Jawaban. Pembahasan muncul setelah diperiksa.</p><p><b>Pertanyaan pemantik:</b> <i>Bagaimana grafik membedakan mobil yang melaju stabil dengan mobil yang terus menambah kecepatan?</i></p><p><b>Aktivitas eksplorasi:</b> buka tab Simulasi, bandingkan grafik pada mode GLB (a = 0) dan GLBB (a = 2), lalu jawab soal berikut.</p></div><div class="grid2" style="margin-top:10px"><div class="card"><h3>A. Pemahaman dan penerapan</h3>'+QL.map(qHTML).join('')+'<p><b>Tantangan pemecahan masalah:</b> kerjakan Misi 1–3 di Simulasi.</p></div><div class="card"><h3>B. Refleksi dan kesimpulan</h3><label for="rf"><b>Tulis kesimpulan dan refleksimu</b> (min. 30 karakter)</label><textarea id="rf" rows="6" placeholder="Apa yang kamu pelajari tentang GLB, GLBB, dan grafiknya?">'+S.refl+'</textarea><p><b>Penilaian mandiri (rubrik):</b></p>'+rub.map(function(r,i){return '<label style="display:block"><input type="checkbox" data-rub="'+i+'" '+(S.rub[i]?'checked':'')+'> '+r+'</label>'}).join('')+'<div id="rfb">'+(S.done.refl?'<div class="fb ok">✅ Refleksi terisi dan rubrik terpenuhi (+10).</div>':'')+'</div></div></div><p style="margin-top:10px"><button id="chk">✔ Periksa Jawaban</button> <button class="ghost" id="sv2">💾 Simpan Progres</button> <button class="ghost" id="rl">↺ Reset LKM</button> <button id="pdf">📄 Unduh LKM (PDF)</button> <button class="ghost" id="pl">🖨 Cetak / Simpan PDF</button></p>'}
+function checkLKM(){var n=0;QL.forEach(function(id){if(check(id))n++});var rf=S.refl.trim(),rb=S.rub.filter(Boolean).length,msg='';
+if(rf.length>=30&&rb>=2){award('refl',10)}else msg='<div class="fb bad">Refleksi: tulis minimal 30 karakter dan centang minimal 2 butir rubrik yang benar-benar kamu penuhi.</div>';
+rLKM();if(msg)$('#rfb').innerHTML=msg;if(n<QL.length)toast('Ada '+(QL.length-n)+' soal belum dijawab.');hud();save()}
+
+function rDev(){var rows=[['Nama pengembang','SRIWAHYUNI, S.Pd., Gr., M.Pd.'],['Instansi','SMAN 1 Pinrang'],['Mata pelajaran','Fisika'],['Unit materi','GLB dan GLBB'],['Fase/Kelas/Semester','E / X / Ganjil'],['Kabupaten/Kota','Pinrang (diambil dari nama instansi; mohon dikonfirmasi)'],['Tahun','2026'],['Capaian Pembelajaran','Menganalisis Gerak Dua Dimensi'],['Tujuan Pembelajaran','Membedakan GLB dan GLBB; menentukan GLB dan GLBB; menganalisis GLB dan GLBB dengan grafik']];
+$('#tab-pengembang').innerHTML='<div class="grid2"><div class="card"><h2>👩‍🏫 Profil pengembang</h2><table>'+rows.map(function(r){return '<tr><th>'+r[0]+'</th><td>'+r[1]+'</td></tr>'}).join('')+'</table></div><div class="card"><h3>Tentang game</h3><p>Game ini membantu peserta didik membedakan dan menganalisis GLB dan GLBB melalui teori bertahap, prosedur, simulasi lintasan, dan LKM digital.</p><h3>Cara menggunakan</h3><p>Isi nama, jelajahi lima tab, kumpulkan poin, lalu buka Hasil. Gunakan Cetak di LKM atau Hasil untuk menyimpan PDF.</p><h3>Teknologi</h3><p>HTML5, CSS3, Vanilla JavaScript, Canvas, Web Audio API, localStorage (opsional).</p><p>📴 <b>Dirancang untuk penggunaan offline</b> dalam satu berkas index.html.</p></div></div>'}
+
+/* ===== Modal, hasil ===== */
+function modal(h){$('#mbox').innerHTML=h;$('#modal').classList.remove('hidden')}
+function closeM(){$('#modal').classList.add('hidden')}
+function result(review){var ids=Object.keys(Q),c=ids.filter(function(k){return S.right[k]}).length,pct=Math.round(c/ids.length*100),ms=['ord','m1','m2','m3'].filter(function(k){return S.done[k]}).length;
+var B=[['📖 Pembaca Teliti',QT.every(function(k){return S.right[k]})],['🧭 Navigator Prosedur',S.done.ord],['🏁 Pembalap Presisi',S.done.sim],['📈 Analis Grafik',QL.every(function(k){return S.right[k]})],['🏆 Juara Lintasan',S.done.bonus]];
+var rec=[];if(!QT.every(function(k){return S.right[k]}))rec.push('Teori (GLB, GLBB, grafik)');if(!S.done.ord)rec.push('Prosedur');if(!S.done.sim)rec.push('Simulasi (misi 1–3)');if(!QL.every(function(k){return S.right[k]}))rec.push('LKM soal yang belum benar');
+var fbk=pct>=80?'Hebat! Pemahamanmu kuat.':pct>=50?'Cukup baik. Ulangi bagian yang masih keliru.':'Ayo pelajari lagi Teori dan coba Simulasi.';
+if(review){modal('<h2>Pembahasan</h2>'+ids.map(function(k){var q=Q[k];return '<p><b>['+q.tab+'] '+q.text+'</b><br>'+(S.right[k]?'✅ ':'⬜ ')+q.exp+'</p>'}).join('')+'<p><button data-x="res">← Kembali ke hasil</button> <button class="ghost" data-x="close">Tutup</button></p>');return}
+modal('<h2>🏁 Hasil akhir</h2><p><b>'+S.name+'</b></p><table><tr><th>Skor akhir</th><td>'+S.score+'</td></tr><tr><th>Jawaban benar</th><td>'+c+' dari '+ids.length+' ('+pct+'%)</td></tr><tr><th>Misi selesai</th><td>'+ms+' dari 4</td></tr><tr><th>Progres</th><td>'+prog()+'%</td></tr></table><p>'+B.map(function(b){return '<span class="badge '+(b[1]?'got':'')+'">'+b[0]+'</span>'}).join('')+'</p><p>'+fbk+'</p><p><b>Pelajari lagi:</b> '+(rec.length?rec.join(', '):'tidak ada, semua tuntas!')+'</p><p style="font-size:13px;color:var(--mut)">Ini evaluasi di dalam game, bukan otomatis nilai resmi sekolah.</p><p><button data-x="again">Main Lagi</button> <button class="ghost" data-x="rev">Lihat Pembahasan</button> <button class="ghost" data-x="print">Cetak Hasil</button> <button class="ghost" data-x="close">Tutup</button></p>')}
+function confirmReset(){modal('<h2>Reset permainan</h2><p>Apakah Anda yakin ingin mengulang permainan? Progres permainan saat ini akan direset?</p><p><button class="ghost" data-x="close">Batal</button> <button data-x="doreset">Ya, Reset</button></p>')}
+function doReset(){try{localStorage.removeItem(KEY)}catch(e){}var n=S.name,s=S.snd;S=fresh(n,s);resetSim();closeM();showTab('teori');toast('Permainan direset.')}
+function printWith(c,fallback){var done=function(){document.body.classList.remove(c);window.removeEventListener('afterprint',done)};
+document.body.classList.add(c);window.addEventListener('afterprint',done);
+requestAnimationFrame(function(){requestAnimationFrame(function(){try{if(typeof window.print!=='function')throw 0;window.print();toast('Pilih "Simpan sebagai PDF" pada dialog cetak. Jika dialog tidak muncul, buka file di browser biasa.')}catch(e){done();if(fallback){toast('Dialog cetak tidak tersedia. Mengunduh PDF sebagai gantinya.');fallback()}else toast('Fitur cetak tidak tersedia di browser ini.')}setTimeout(done,60000)})})}
+
+/* ===== Generator PDF (offline, tanpa pustaka) ===== */
+function pdfClean(t){t=String(t).replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu,'');var m={'₀':'0','₁':'1','≠':'!=','→':'->','←':'<-','—':'-','–':'\x96','“':'"','”':'"','’':"'",'≈':'~','·':'\xB7'},o='';for(var i=0;i<t.length;i++){var c=t[i];if(m[c]!==undefined)o+=m[c];else{var k=c.charCodeAt(0);o+=(k<256&&(k<128||k>159))?c:'?'}}return o}
+function pdfEsc(t){return t.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)')}
+function pdfWrap(t,size,bold){var max=495/(size*(bold?.58:.53)),w=t.split(/\s+/),l=[],c='';w.forEach(function(x){if((c+' '+x).trim().length>max){if(c)l.push(c);c=x}else c=(c+' '+x).trim()});if(c)l.push(c);return l.length?l:['']}
+function buildPDF(items){var pages=[[]],y=800;
+items.forEach(function(it){var lines=pdfWrap(pdfClean(it.t),it.s,it.b),h=it.s*1.4;y-=it.g||0;
+lines.forEach(function(ln){if(y<60){pages.push([]);y=800}pages[pages.length-1].push('BT /'+(it.b?'F2':'F1')+' '+it.s+' Tf 50 '+y.toFixed(1)+' Td ('+pdfEsc(ln)+') Tj ET');y-=h})});
+var objs=[],n=pages.length;objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
+var kids=pages.map(function(_,i){return (5+i*2)+' 0 R'}).join(' ');objs[2]='<< /Type /Pages /Kids ['+kids+'] /Count '+n+' >>';
+objs[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+pages.forEach(function(pg,i){var st=pg.join('\n')+'\nBT /F1 8 Tf 50 30 Td (GIM GL 02 - SMAN 1 Pinrang - Halaman '+(i+1)+' dari '+n+') Tj ET';objs[5+i*2]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents '+(6+i*2)+' 0 R >>';objs[6+i*2]='<< /Length '+st.length+' >>\nstream\n'+st+'\nendstream'});
+var out='%PDF-1.4\n',off=[];for(var k=1;k<objs.length;k++){off[k]=out.length;out+=k+' 0 obj\n'+objs[k]+'\nendobj\n'}
+var x=out.length;out+='xref\n0 '+objs.length+'\n0000000000 65535 f \n';for(var j=1;j<objs.length;j++)out+=('0000000000'+off[j]).slice(-10)+' 00000 n \n';
+out+='trailer\n<< /Size '+objs.length+' /Root 1 0 R >>\nstartxref\n'+x+'\n%%EOF';
+var u=new Uint8Array(out.length);for(var q=0;q<out.length;q++)u[q]=out.charCodeAt(q)&255;return u}
+function downloadLKM(){var rf=$('#rf');if(rf)S.refl=rf.value;var it=[],H=function(t){it.push({t:t,s:13,b:1,g:10})},P=function(t,g){it.push({t:t,s:10.5,g:g||2})};
+it.push({t:'LEMBAR KERJA MURID (LKM)',s:18,b:1});it.push({t:'GIM GL 02 - Fisika: GLB dan GLBB (Fase E / Kelas X)',s:11,g:2});
+H('Identitas');P('Nama: '+S.name);P('Instansi: SMAN 1 Pinrang');P('Tanggal cetak: '+new Date().toLocaleDateString('id-ID'));
+H('Tujuan');P('Membedakan GLB dan GLBB, menentukan jenisnya, dan menganalisisnya dengan grafik.');
+H('Soal dan jawaban');
+QL.forEach(function(id){var q=Q[id],a=S.ans[id],r=S.res[id],ja=a===undefined||a===''?'(belum dijawab)':(q.type==='num'?a+' '+q.unit:q.opts[a]),st=r===undefined?(a===undefined||a===''?'Belum dijawab':'Belum diperiksa'):(r?'Benar':'Belum tepat');
+it.push({t:q.text,s:10.5,b:1,g:8});P('Jawaban: '+ja);P('Status: '+st);if(r!==undefined)P('Pembahasan: '+q.exp)});
+H('Refleksi dan kesimpulan');P(S.refl.trim()||'(belum diisi)');
+var rb=['Menjelaskan perbedaan GLB dan GLBB','Menyebut bukti dari simulasi atau grafik','Menyebut contoh kehidupan sehari-hari'];rb.forEach(function(r,i){P((S.rub[i]?'[x] ':'[ ] ')+r,1)});
+var c=QL.filter(function(k){return S.right[k]}).length;H('Ringkasan');P('Soal LKM benar: '+c+' dari '+QL.length+'. Skor game saat ini: '+S.score+'. Progres: '+prog()+'%.');
+P('Catatan: ini evaluasi di dalam game, bukan otomatis nilai resmi sekolah.',8);
+try{var blob=new Blob([buildPDF(it)],{type:'application/pdf'}),url=URL.createObjectURL(blob),el=document.createElement('a');el.href=url;el.download='LKM_GIM_GL02_'+S.name.replace(/[^\w-]+/g,'_')+'.pdf';document.body.appendChild(el);el.click();document.body.removeChild(el);setTimeout(function(){URL.revokeObjectURL(url)},4000);toast('LKM (PDF) diunduh.')}catch(e){toast('Gagal membuat PDF. Gunakan tombol Cetak lalu pilih Simpan sebagai PDF.')}}
+
+/* ===== Events ===== */
+document.addEventListener('click',function(e){var t=e.target,b=t.closest('button');if(!b&&!t.closest('[data-q]'))return;if(b)sfx.click();
+if(b&&b.dataset.tab){showTab(b.dataset.tab);return}
+if(b&&b.dataset.go){showTab(b.dataset.go);return}
+if(b&&b.dataset.q){var id=b.dataset.q;S.ans[id]=+b.dataset.o;delete S.res[id];if(QT.indexOf(id)>-1){check(id);rTeori();hud()}else rLKM();save();return}
+if(b&&b.dataset.nav){var n=b.dataset.nav;if(n==='tp+')S.tp++;if(n==='tp-')S.tp--;if(n==='ps+')S.ps++;if(n==='ps-')S.ps--;showTab(S.tab);return}
+if(b&&b.dataset.mv!==undefined){var j=+b.dataset.mv,d=+b.dataset.d,o=S.ordCur;if(j+d<0||j+d>=o.length)return;var tmp=o[j];o[j]=o[j+d];o[j+d]=tmp;rProsedur();save();return}
+if(b&&b.hasAttribute('data-shuf')){S.ordCur=[2,4,1,3,0];rProsedur();return}
+if(b&&b.hasAttribute('data-chkord')){var ok=S.ordCur.every(function(v,i){return v===i});var f=$('#ordfb');if(ok){var g=award('ord',20);f.innerHTML='<div class="fb ok">✅ Urutan benar! '+(g?'+20 poin.':'(poin sudah diambil)')+'</div>';hud();save()}else{sfx.bad();var w=S.ordCur.map(function(v,i){return v===i?0:1}).reduce(function(a,c){return a+c});f.innerHTML='<div class="fb bad">❌ '+w+' langkah belum tepat. Petunjuk: mulai dari mencatat besaran, akhiri dengan memeriksa hasil.</div>'}return}
+if(b&&b.dataset.m!==undefined){pickM(+b.dataset.m);return}
+if(b&&b.id==='run'){runSim();return}
+if(b&&b.id==='hint'){var h=M[sim.m].hint;$('#out').className='fb';$('#out').textContent='💡 '+h;return}
+if(b&&b.id==='rs'){resetSim();toast('Simulasi diulang. Poin yang sudah diperoleh tetap tercatat.');return}
+if(b&&b.id==='chk'){S.refl=($('#rf')||{value:S.refl}).value;checkLKM();return}
+if(b&&b.id==='sv2'){S.refl=$('#rf').value;save();toast(storageOK?'Progres disimpan.':'Penyimpanan tidak tersedia; progres hanya di sesi ini.');return}
+if(b&&b.id==='rl'){QL.forEach(function(k){delete S.ans[k];delete S.res[k]});S.refl='';S.rub=[0,0,0];rLKM();save();toast('LKM direset. Poin yang sudah diperoleh tetap tercatat.');return}
+if(b&&b.id==='pdf'){downloadLKM();return}
+if(b&&b.id==='pl'){S.refl=$('#rf').value;printWith('p-lkm',downloadLKM);return}
+if(b&&b.id==='bSnd'){S.snd=!S.snd;hud();save();return}
+if(b&&b.id==='bFs'){try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(function(){toast('Layar penuh ditolak browser.')})}catch(x){toast('Layar penuh tidak didukung.')}return}
+if(b&&b.id==='bHelp'){modal('<h2>Bantuan</h2><p>Teori: baca dan jawab kuis (+10 tiap soal benar, sekali). Prosedur: urutkan langkah (+20). Simulasi: 3 misi (+20 tiap misi) dan bonus +30 bila semua selesai. LKM: soal (+10) dan refleksi (+10). Semua aktivitas tuntas memberi bonus +50.</p><p><button data-x="close">Tutup</button></p>');return}
+if(b&&b.id==='bRes'){result();return}
+if(b&&b.id==='bReset'){confirmReset();return}
+if(b&&b.dataset.x){var x=b.dataset.x;if(x==='close')closeM();if(x==='res')result();if(x==='rev')result(true);if(x==='print')printWith('p-res');if(x==='doreset')doReset();if(x==='again'){doReset()}}
+});
+document.addEventListener('input',function(e){var t=e.target;
+if(t.dataset.qn){S.ans[t.dataset.qn]=t.value;delete S.res[t.dataset.qn];save()}
+if(t.id==='rf'){S.refl=t.value}
+if(t.dataset.rub!==undefined){S.rub[+t.dataset.rub]=t.checked?1:0;save()}
+if(t.id==='sv'){sim.v0=+t.value;$('#vv').textContent=sim.v0+' m/s';draw(0)}
+if(t.id==='sa'){sim.a=+t.value;$('#av').textContent=sim.a+' m/s²';draw(0)}
+if(t.name==='md'){sim.mode=t.value;if(sim.mode==='GLB')sim.a=0;rSim()}});
+$('#go').addEventListener('click',function(){var n=$('#nm').value.trim();if(!n){$('#nm').focus();toast('Tulis nama atau nama panggilanmu dulu.');return}
+var old=load();S=(old&&old.name===n)?old:fresh(n,S.snd);S.name=n;sfx.start();$('#start').classList.add('hidden');$('#app').classList.remove('hidden');buildNav();showTab(S.tab||'teori');if(old&&old.name===n)toast('Selamat datang kembali, '+n+'! Progres dipulihkan.');if(!storageOK)toast('Penyimpanan lokal tidak tersedia. Progres hanya tersimpan selama sesi ini.')});
+$('#nm').addEventListener('keydown',function(e){if(e.key==='Enter')$('#go').click()});
+})();
+</script>
+</body>
+</html>
